@@ -1,0 +1,19 @@
+baseURL = 'https://sherlockdace.github.io'
+languageCode = 'en-us'
+title = 'Morphism42 Blog'
+theme = 'paper'
+
+[params]
+# color style
+color = 'light'                           # linen, wheat, gray, light
+
+# header social icons
+github = 'sherlockdace'                 # github.com/YOUR_GITHUB_ID
+
+# misc
+disableHLJS = true                        # disable highlight.js
+disablePostNavigation = true              # disable post navigation
+monoDarkIcon = true                       # show monochrome dark mode icon
+gravatarCdn = 'GRAVATAR_CDN_LINK'         # e.g. 'https://cdn.v2ex.com/gravatar/'
+math = true                               # enable KaTeX math typesetting globally
+localKatex = false                        # use local KaTeX js/css instead of CDN

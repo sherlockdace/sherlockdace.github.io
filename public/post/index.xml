@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Morphism42 Blog</title>
+    <link>https://sherlockdace.github.io/post/</link>
+    <description>Recent content in Posts on Morphism42 Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 29 Jun 2024 20:08:01 +0800</lastBuildDate><atom:link href="https://sherlockdace.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Magnitude Level of First-Order Methods</title>
+      <link>https://sherlockdace.github.io/post/gd_level/</link>
+      <pubDate>Sat, 29 Jun 2024 20:08:01 +0800</pubDate>
+      
+      <guid>https://sherlockdace.github.io/post/gd_level/</guid>
+      <description>In broad terms, the majority of training problems we encounter involve the task of locating a global or local minimum of a given function $f(\theta)$. Within the field of deep learning, $\theta$ represents the parameter values to be determined for a given neural network structure. Numerous approaches, particularly first-order methods, have been devised to identify the local or global optimal minimum point $\theta^*$. In this blog, we aim to delve into the discussion surrounding the magnitude level of the correction term in these first-order methods.</description>
+    </item>
+    
+  </channel>
+</rss>
