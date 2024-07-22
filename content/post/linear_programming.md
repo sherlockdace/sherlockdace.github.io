@@ -1,7 +1,7 @@
 ---
 title: "How to Solve Linear Programming Efficiently?"
 date: 2024-07-22T16:58:56+08:00
-draft: true
+draft: false
 math: true
 ---
 
