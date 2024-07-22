@@ -4,8 +4,7 @@
     <title>Categories on Morphism42</title>
     <link>https://sherlockdace.github.io/categories/</link>
     <description>Recent content in Categories on Morphism42</description>
-    <generator>Hugo</generator>
-    <language>en-us</language>
-    <atom:link href="https://sherlockdace.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language><atom:link href="https://sherlockdace.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
