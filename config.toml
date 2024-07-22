@@ -1,6 +1,6 @@
 baseURL = 'https://sherlockdace.github.io'
 languageCode = 'en-us'
-title = 'Morphism42 Blog'
+title = 'Morphism42'
 theme = 'paper'
 
 [params]

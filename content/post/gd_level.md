@@ -1,7 +1,7 @@
 ---
 title: "The Magnitude Level of First-Order Methods"
 date: 2024-06-29T20:08:01+08:00
-draft: 
+draft: true
 math: true
 ---
 
