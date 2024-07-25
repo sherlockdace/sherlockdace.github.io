@@ -4,18 +4,16 @@
     <title>Morphism42</title>
     <link>https://sherlockdace.github.io/</link>
     <description>Recent content on Morphism42</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 22 Jul 2024 16:58:56 +0800</lastBuildDate><atom:link href="https://sherlockdace.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 22 Jul 2024 16:58:56 +0800</lastBuildDate>
+    <atom:link href="https://sherlockdace.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>How to Solve Linear Programming Efficiently?</title>
       <link>https://sherlockdace.github.io/post/linear_programming/</link>
       <pubDate>Mon, 22 Jul 2024 16:58:56 +0800</pubDate>
-      
       <guid>https://sherlockdace.github.io/post/linear_programming/</guid>
-      <description>Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
-However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough.</description>
+      <description>Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.&#xA;However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough.</description>
     </item>
-    
   </channel>
 </rss>

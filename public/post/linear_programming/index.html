@@ -138,33 +138,41 @@ However, when it comes to solving large-scale problems with millions (even billi
   <link rel="apple-touch-icon" href="https://sherlockdace.github.io/apple-touch-icon.png" />
 
   
-  <meta name="generator" content="Hugo 0.111.3">
+  <meta name="generator" content="Hugo 0.128.0">
 
   
   
   
+  
+  
+
+
   
   
   <meta itemprop="name" content="How to Solve Linear Programming Efficiently?">
-<meta itemprop="description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
-However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough."><meta itemprop="datePublished" content="2024-07-22T16:58:56+08:00" />
-<meta itemprop="dateModified" content="2024-07-22T16:58:56+08:00" />
-<meta itemprop="wordCount" content="1109">
-<meta itemprop="keywords" content="" />
+  <meta itemprop="description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
+However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough.">
+  <meta itemprop="datePublished" content="2024-07-22T16:58:56+08:00">
+  <meta itemprop="dateModified" content="2024-07-22T16:58:56+08:00">
+  <meta itemprop="wordCount" content="1102">
   
-  <meta property="og:title" content="How to Solve Linear Programming Efficiently?" />
-<meta property="og:description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
-However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough." />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://sherlockdace.github.io/post/linear_programming/" /><meta property="article:section" content="post" />
-<meta property="article:published_time" content="2024-07-22T16:58:56+08:00" />
-<meta property="article:modified_time" content="2024-07-22T16:58:56+08:00" />
+  <meta property="og:url" content="https://sherlockdace.github.io/post/linear_programming/">
+  <meta property="og:site_name" content="Morphism42">
+  <meta property="og:title" content="How to Solve Linear Programming Efficiently?">
+  <meta property="og:description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
+However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="post">
+    <meta property="article:published_time" content="2024-07-22T16:58:56+08:00">
+    <meta property="article:modified_time" content="2024-07-22T16:58:56+08:00">
 
   
-  <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="How to Solve Linear Programming Efficiently?"/>
-<meta name="twitter:description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
-However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough."/>
+  
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="How to Solve Linear Programming Efficiently?">
+  <meta name="twitter:description" content="Background Simplex Method Interior-Point Method ALM and ADMM PDHG Background One fundamental question in the field of optimization is how to solve linear programming (LP) problems. Typically, there are two well-known frameworks, namely the Simplex Method and the Interior-Point Method, that have been proposed to tackle LP problems.
+However, when it comes to solving large-scale problems with millions (even billions) of variables and constraints, both the Simplex Method and the Interior-Point Method may not be practical enough.">
 
   
   
@@ -179,7 +187,7 @@ However, when it comes to solving large-scale problems with millions (even billi
   <div class="relative z-50 mr-auto flex items-center">
     <a
       class="-translate-x-[1px] -translate-y-[1px] text-2xl font-semibold"
-      href="https://sherlockdace.github.io"
+      href="https://sherlockdace.github.io/"
       >Morphism42</a
     >
     <div
@@ -331,20 +339,21 @@ $$
 The ALM method, which has been widely studied (see <a href="https://en.wikipedia.org/wiki/Augmented_Lagrangian_method">wiki</a>), is given as:
 $$
 \begin{dcases}
-x^{k+1} := \argmin_x \mathcal{L} (x, y^k; \rho) = (A^\top A)^{-1} \left(A^\top b - \frac{1}{\rho} (c + A^\top y^k) \right); \\
+x^{k+1} := \argmin_{x \geq 0} \mathcal{L} (x, y^k; \rho) ; \\
 y^{k+1} := y^k + \rho * (A x^{k+1} - b).
 \end{dcases}
 $$</p>
-<p>In general, we employ matrix decomposition, like LU decomposition or Cholesky decomposition, to matrix $A^\top A$. This decomposition is then used to solve linear systems arising in the update steps more efficiently.</p>
-<p>However, despite these advantages, the ALM still has some practical limitations. It&rsquo;s important to note that even in ALM, we need to solve a linear system at each step to obtain the update for $x^{k+1}$.
-What&rsquo;s worse is that the matrix $A^\top A$ is not always an ideal matrix. In fact, it tends to be ill-conditioned for large-scale linear programming (LP) problems, which means its decomposition can be numerically unstable.</p>
-<p>To address this issue and improve the stability of the ALM update, we can utilize the <a href="https://pubsonline.informs.org/doi/10.1287/moor.1.2.97">Proximal ALM</a>. In this approach, instead of decomposing the matrix $A^\top A$, we decompose the matrix $\mu I + A^\top A$, where $\mu$ is a positive constant.
-Admittedly, the Proximal ALM may be slightly slower than the regular ALM in practice. However, by introducing the additional term $\mu I$, the matrix decomposition becomes more feasible and implementable, thus enhancing the overall stability of the method.</p>
-<p>Besides the ALM and Proximal ALM, another algorithm called ADMM is also applied to solve LP.
-Some recent works, like <a href="https://dl.acm.org/doi/pdf/10.5555/3294771.3294912">new ADMM</a> (not a new one in fact), <a href="https://web.stanford.edu/class/msande310/ADMM1.pdf">ADMM application</a> (looks like a homework), <a href="https://arxiv.org/abs/2209.01793">enhanced ADMM</a> (ADMM + ipm, 😓), studied the ADMM and its variants to efficiently solve LP.
-While recent works have explored different aspects of ADMM, such as its applications and enhancements, it is important to note that ADMM and its variants still require solving linear systems at each iteration.</p>
-<p>But let&rsquo;s not forget about our ALM buddies. Sure, they may be slower than the flashy ipm crowd, but they have their reasons (or maybe they&rsquo;re just a little slower in general). These ALM types also need to solve linear systems at each step, which can be a real headache for large-scale LP problems. So, why do we use ALM type algorithms instead of IPM?
-I don&rsquo;t know. But the fact is that the ALM type algorithms are actually employed in real world applications.</p>
+<p>When applying the Augmented Lagrangian Method (ALM) to solve Linear Programming (LP) problems, several challenges arise. One significant obstacle is the lack of an explicit formulation for calculating the next iteration, $ x^{k+1} $. This computation of $ x^{k+1} $ poses a major difficulty in the process.</p>
+<p>Various methods exist to address this issue, such as Newton&rsquo;s method or Semi-Newton&rsquo;s method. However, these methods come with drawbacks. For instance, fast algorithms like the Semi-Newton method often necessitate solving linear systems, which can be problematic for large-scale LP scenarios. Additionally, regardless of the approach used to solve the subproblem, these methods typically involve iterative processes, effectively turning the application of ALM into a two-loop method.</p>
+<p>These inherent drawbacks can render the practical application of ALM challenging. Despite these limitations, some studies have successfully utilized ALM-type algorithms to tackle LP problems, such as this <a href="https://arxiv.org/abs/1903.09546">work</a>, achieving promising results. (I don&rsquo;t know why.)</p>
+<p>ADMM algorithm is another algorithm used to solve linear programming problems. A survey of this application can be found at: <a href="https://web.stanford.edu/class/msande310/ADMM1.pdf">ADMM application</a> (seems like a homework).
+In comparison to ALM, the ADMM iteration avoids the necessity of a two-loop update, although it still requires solving a linear system at each iteration step.
+Moreover, as observed, the coefficient matrix of the linear system (i.e., the left-hand side part) remains fixed during the iteration.
+Therefore, matrix decomposition methods can be utilized to preprocess the linear system and boost the ADMM update process.</p>
+<p>However, numerical experiments reveal that ADMM is slower than ALM, despite ALM being a two-loop method. This observation aligns with findings from previous studies, although I&rsquo;m unsure if this holds true for large-scale linear programming (LP) problems.
+Furthermore, the convergence rate of ADMM is unsatisfactory.
+In addition to these drawbacks, selecting the optimal hyperparameter in the ADMM update is a challenging task. Even widely-accepted empirical approaches like <a href="https://stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf">ADMM Chapter 3</a> have failed to deliver in large-scale LP scenarios (at least in my experience, although I&rsquo;m uncertain if this is a universal phenomenon)</p>
+<p>In summary, though ADMM looks like better than ALM, maybe ALM is a better choice for solving LP than ADMM.</p>
 <h2 id="pdhg">PDHG</h2>
 </section>
 
@@ -374,7 +383,7 @@ I don&rsquo;t know. But the fact is that the ALM type algorithms are actually em
 >
   <div class="mr-auto">
     &copy; 2024
-    <a class="link" href="https://sherlockdace.github.io">Morphism42</a>
+    <a class="link" href="https://sherlockdace.github.io/">Morphism42</a>
   </div>
   <a class="link mx-6" href="https://gohugo.io/" rel="noopener" target="_blank"
     >Powered by Hugo️️</a

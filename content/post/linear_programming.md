@@ -64,24 +64,26 @@ $$
 The ALM method, which has been widely studied (see [wiki](https://en.wikipedia.org/wiki/Augmented_Lagrangian_method)), is given as:
 $$
 \begin{dcases}
-x^{k+1} := \argmin_x \mathcal{L} (x, y^k; \rho) = (A^\top A)^{-1} \left(A^\top b - \frac{1}{\rho} (c + A^\top y^k) \right); \\\ 
+x^{k+1} := \argmin_{x \geq 0} \mathcal{L} (x, y^k; \rho) ; \\\ 
 y^{k+1} := y^k + \rho * (A x^{k+1} - b).
 \end{dcases}
 $$
 
-In general, we employ matrix decomposition, like LU decomposition or Cholesky decomposition, to matrix $A^\top A$. This decomposition is then used to solve linear systems arising in the update steps more efficiently.
+When applying the Augmented Lagrangian Method (ALM) to solve Linear Programming (LP) problems, several challenges arise. One significant obstacle is the lack of an explicit formulation for calculating the next iteration, $ x^{k+1} $. This computation of $ x^{k+1} $ poses a major difficulty in the process.
 
-However, despite these advantages, the ALM still has some practical limitations. It's important to note that even in ALM, we need to solve a linear system at each step to obtain the update for $x^{k+1}$.
-What's worse is that the matrix $A^\top A$ is not always an ideal matrix. In fact, it tends to be ill-conditioned for large-scale linear programming (LP) problems, which means its decomposition can be numerically unstable.
+Various methods exist to address this issue, such as Newton's method or Semi-Newton's method. However, these methods come with drawbacks. For instance, fast algorithms like the Semi-Newton method often necessitate solving linear systems, which can be problematic for large-scale LP scenarios. Additionally, regardless of the approach used to solve the subproblem, these methods typically involve iterative processes, effectively turning the application of ALM into a two-loop method.
 
-To address this issue and improve the stability of the ALM update, we can utilize the [Proximal ALM](https://pubsonline.informs.org/doi/10.1287/moor.1.2.97). In this approach, instead of decomposing the matrix $A^\top A$, we decompose the matrix $\mu I + A^\top A$, where $\mu$ is a positive constant.
-Admittedly, the Proximal ALM may be slightly slower than the regular ALM in practice. However, by introducing the additional term $\mu I$, the matrix decomposition becomes more feasible and implementable, thus enhancing the overall stability of the method.
+These inherent drawbacks can render the practical application of ALM challenging. Despite these limitations, some studies have successfully utilized ALM-type algorithms to tackle LP problems, such as this [work](https://arxiv.org/abs/1903.09546), achieving promising results. (I don't know why.)
 
-Besides the ALM and Proximal ALM, another algorithm called ADMM is also applied to solve LP.
-Some recent works, like [new ADMM](https://dl.acm.org/doi/pdf/10.5555/3294771.3294912) (not a new one in fact), [ADMM application](https://web.stanford.edu/class/msande310/ADMM1.pdf) (looks like a homework), [enhanced ADMM](https://arxiv.org/abs/2209.01793) (ADMM + ipm, 😓), studied the ADMM and its variants to efficiently solve LP.
-While recent works have explored different aspects of ADMM, such as its applications and enhancements, it is important to note that ADMM and its variants still require solving linear systems at each iteration.
+ADMM algorithm is another algorithm used to solve linear programming problems. A survey of this application can be found at: [ADMM application](https://web.stanford.edu/class/msande310/ADMM1.pdf) (seems like a homework).
+In comparison to ALM, the ADMM iteration avoids the necessity of a two-loop update, although it still requires solving a linear system at each iteration step.
+Moreover, as observed, the coefficient matrix of the linear system (i.e., the left-hand side part) remains fixed during the iteration.
+Therefore, matrix decomposition methods can be utilized to preprocess the linear system and boost the ADMM update process.
 
-But let's not forget about our ALM buddies. Sure, they may be slower than the flashy ipm crowd, but they have their reasons (or maybe they're just a little slower in general). These ALM types also need to solve linear systems at each step, which can be a real headache for large-scale LP problems. So, why do we use ALM type algorithms instead of IPM? 
-I don't know. But the fact is that the ALM type algorithms are actually employed in real world applications. 
+However, numerical experiments reveal that ADMM is slower than ALM, despite ALM being a two-loop method. This observation aligns with findings from previous studies, although I'm unsure if this holds true for large-scale linear programming (LP) problems.
+Furthermore, the convergence rate of ADMM is unsatisfactory.
+In addition to these drawbacks, selecting the optimal hyperparameter in the ADMM update is a challenging task. Even widely-accepted empirical approaches like [ADMM Chapter 3](https://stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf) have failed to deliver in large-scale LP scenarios (at least in my experience, although I'm uncertain if this is a universal phenomenon)
+
+In summary, though ADMM looks like better than ALM, maybe ALM is a better choice for solving LP than ADMM.
 
 ## PDHG
