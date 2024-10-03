@@ -37,7 +37,7 @@
   style="--bg: #fff"
   lang="en-us"
 >
-  <head>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta
@@ -46,7 +46,7 @@
   />
 
   
-  <title>Categories - Morphism42</title>
+  <title>Quantization in LLMs - Morphism42</title>
 
   
   <meta name="theme-color" />
@@ -55,11 +55,7 @@
   
   
   
-  
-  <meta
-    name="description"
-    content="A personal blog"
-  />
+  <meta name="description" content="As large language models (LLMs) continue to expand in size and intricacy, mitigating their computational and energy demands has emerged as a pivotal challenge. Quantization has surfaced as a prominent approach, involving the reduction of parameter precision in models to lower bit formats. For instance, numerous methodologies truncate parameters from the conventional 16-bit floating point (FP16) or 32-bit floating point (FP32) to diminished bit formats such as 8-bit or 4-bit." />
   <meta name="author" content="Morphism42" />
   
 
@@ -69,14 +65,14 @@
   
   
   
-  <link rel="preload stylesheet" as="style" href="https://sherlockdace.github.io/main.min.css" />
+  <link rel="preload stylesheet" as="style" href="http://localhost:1313/main.min.css" />
 
   
   
   
   
   
-  <link rel="preload" as="image" href="https://sherlockdace.github.io/theme.svg" />
+  <link rel="preload" as="image" href="http://localhost:1313/theme.svg" />
 
   
   
@@ -86,7 +82,7 @@
 
   
   
-  <link rel="preload" as="image" href="https://sherlockdace.github.io/github.svg" />
+  <link rel="preload" as="image" href="http://localhost:1313/github.svg" />
   
   
 
@@ -139,11 +135,11 @@
   
   <link
     rel="icon"
-    href="https://sherlockdace.github.io/favicon.ico"
+    href="http://localhost:1313/favicon.ico"
   />
   <link
     rel="apple-touch-icon"
-    href="https://sherlockdace.github.io/apple-touch-icon.png"
+    href="http://localhost:1313/apple-touch-icon.png"
   />
 
   
@@ -152,45 +148,12 @@
   
   
   
-  
-  
-
-
-  
-  
-  <meta itemprop="name" content="Categories">
-  
-  <meta property="og:url" content="https://sherlockdace.github.io/categories/">
-  <meta property="og:site_name" content="Morphism42">
-  <meta property="og:title" content="Categories">
-  <meta property="og:locale" content="en_us">
-  <meta property="og:type" content="website">
-
-  
-  
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Categories">
-
-  
-  
-  <link
-    rel="alternate"
-    type="application/rss&#43;xml"
-    href="https://sherlockdace.github.io/categories/index.xml"
-    title="Morphism42"
-  />
-  
-
-  
-  <link rel="canonical" href="https://sherlockdace.github.io/categories/" />
-  
-  
 </head>
 
   <body class="text-black duration-200 ease-out dark:text-white">
     <header class="mx-auto flex h-[4.5rem] max-w-3xl px-8 lg:justify-center">
   <div class="relative z-50 mr-auto flex items-center">
-    <a class="-translate-y-[1px] text-2xl" href="https://sherlockdace.github.io/"
+    <a class="-translate-y-[1px] text-2xl" href="http://localhost:1313/"
       >Morphism42</a
     >
     <div
@@ -283,18 +246,49 @@
     >
       
 
+<article>
+  <header class="mb-14">
+    <h1 class="!my-0 pb-2.5">Quantization in LLMs</h1>
+
+    
+    <div class="text-xs antialiased opacity-60">
+      
+      <time>Oct 3, 2024</time>
+      
+      
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>As large language models (LLMs) continue to expand in size and intricacy, mitigating their computational and energy demands has emerged as a pivotal challenge. Quantization has surfaced as a prominent approach, involving the reduction of parameter precision in models to lower bit formats. For instance, numerous methodologies truncate parameters from the conventional 16-bit floating point (FP16) or 32-bit floating point (FP32) to diminished bit formats such as 8-bit or 4-bit.</p>
+<p>In this article, our focus will be on particular quantization models, delving into the fundamental motivations and concepts underpinning these endeavors.</p>
+<h2 id="1-bit">1-BIT</h2>
+<p>We start from the naive idea: 1-bit estimation proposed in <a href="https://arxiv.org/pdf/2310.11453">1-bit LLM</a>.
+One of the basic operator in LLM models is the linear operator <code>nn.Linear</code>.
+Roughly speaking, a linear operator $f$ maps the input $X$ into the output $Y$ with $f(X) := WX$ where $W$ is a tensor.
+For the generic linear operator, the entries of $W$ are float numbers, while the entries of the 1-bit quantization model are in ${ -1, 0, 1 }$.</p>
+<p><img src="../imgs/llm_quant/llm_quant_1.jpg" alt="1-bit quantization linear operator vs FP16 linear operator"></p>
+</section>
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
+  
+
+  
 
 
-
-
-
-
-
-
- 
-
-
-
+  
+</article>
 
 
     </main>
@@ -304,7 +298,7 @@
 >
   <div class="mr-auto">
     &copy; 2024
-    <a class="link" href="https://sherlockdace.github.io/">Morphism42</a>
+    <a class="link" href="http://localhost:1313/">Morphism42</a>
   </div>
   <a class="link mx-6" href="https://gohugo.io/" rel="noopener" target="_blank"
     >powered by hugo️️</a
