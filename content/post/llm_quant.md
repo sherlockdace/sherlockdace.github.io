@@ -16,5 +16,5 @@ One of the basic operator in LLM models is the linear operator `nn.Linear`.
 Roughly speaking, a linear operator $f$ maps the input $X$ into the output $Y$ with $f(X) := WX$ where $W$ is a tensor. 
 For the generic linear operator, the entries of $W$ are float numbers, while the entries of the 1-bit quantization model are in $\{ -1, 0, 1 \}$.
 
-![1-bit quantization linear operator vs FP16 linear operator](../imgs/llm_quant/llm_quant_1.jpg)
+![1-bit quantization linear operator vs FP16 linear operator]("https://github.com/sherlockdace/sherlockdace.github.io/blob/main/content/imgs/llm_quant/llm_quant_1.jpg")
 
