@@ -265,12 +265,63 @@
   <section><p>As large language models (LLMs) continue to expand in size and intricacy, mitigating their computational and energy demands has emerged as a pivotal challenge. Quantization has surfaced as a prominent approach, involving the reduction of parameter precision in models to lower bit formats. For instance, numerous methodologies truncate parameters from the conventional 16-bit floating point (FP16) or 32-bit floating point (FP32) to diminished bit formats such as 8-bit or 4-bit.</p>
 <p>In this article, our focus will be on particular quantization models, delving into the fundamental motivations and concepts underpinning these endeavors.</p>
 <h2 id="1-bit">1-BIT</h2>
-<p>We start from the naive idea: 1-bit estimation proposed in <a href="https://arxiv.org/pdf/2310.11453">1-bit LLM</a>.
-One of the basic operator in LLM models is the linear operator <code>nn.Linear</code>.
-Roughly speaking, a linear operator $f$ maps the input $X$ into the output $Y$ with $f(X) := WX$ where $W$ is a tensor.
-For the generic linear operator, the entries of $W$ are float numbers, while the entries of the 1-bit quantization model are in ${ -1, 0, 1 }$.</p>
-<p><img src="../imgs/llm_quant/llm_quant_1.jpg" alt="1-bit quantization linear operator vs FP16 linear operator"></p>
-</section>
+<p>The concept of 1-bit estimation, as proposed in the <a href="https://arxiv.org/pdf/2310.11453">1-bit LLM paper</a>, introduces a novel approach towards quantization in LLMs.</p>
+<p>In traditional LLM models, a fundamental operation involves the linear operator <code>nn.Linear</code>. In essence, a linear operator $f$ transforms an input $X$ into an output $Y$ through the operation $f(X) := WX$, where $W$ represents a tensor. Typically, in a generic linear operator, the entries of the weight tensor $W$ are real-valued numbers. However, in the context of 1-bit quantization models, the entries are constrained to the set ${ -1, 0, 1 }$, significantly reducing the computational cost of the operation $f(X)$ for LLMs. This reduction in computational cost is a key advantage of the 1-bit quantization scheme, offering potential efficiency gains in the processing of Large Language Models.</p>
+<p><img src="https://github.com/sherlockdace/sherlockdace.github.io/blob/main/content/imgs/llm_quant/llm_quant_1.jpg?raw=true" alt="1-bit quantization linear operator vs FP16 linear operator"></p>
+<p>For the 1-bit model, the input $X$ and the matrix $W$ are both transferred into the integer forms. Specifically, the matrix $W$ is modified according to the following rule:
+$$
+scale_w = \frac{1}{mn \sum_{i, j} |W_{ij}|} ,
+$$
+$$
+W_q = clamp_{[-1, 1]} (round(W * scale_w)),
+$$
+$$
+W_{dequantized} = W_q * scale_w.
+$$</p>
+<p>On the other side, the input $X$ is also required to be modified into integer numbers. The quantization formula is
+$$
+scale_x = \frac{127}{|X|_{max, dim=-1}} ,
+$$</p>
+<p>$$
+X_q = clamp_{[-128, 127]} (round (X * scale_x)),
+$$
+$$
+X_{dequantized} = X_q * sacle_x.
+$$</p>
+<p>Based on this idea, the python code implementation of the 1-bit model is given as follows.
+Let $LN (x):= \frac{x - \mathbb{E} (x)}{\sqrt{Var(x)}}$ be the normalization of the input $X$.
+Then, we have</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Adapted from https://github.com/microsoft/unilm/blob/master/bitnet/The-Era-of-1-bit-LLMs__Training_Tips_Code_FAQ.pdf</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn <span style="color:#66d9ef">as</span> nn 
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch.nn.functional <span style="color:#66d9ef">as</span> F
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">activation_quant</span>(x):
+</span></span><span style="display:flex;"><span>    scale <span style="color:#f92672">=</span> <span style="color:#ae81ff">127.0</span> <span style="color:#f92672">/</span> x<span style="color:#f92672">.</span>abs()<span style="color:#f92672">.</span>max(dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>, keepdim<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>values<span style="color:#f92672">.</span>clamp_(min<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-5</span>)
+</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">=</span> (x <span style="color:#f92672">*</span> scale)<span style="color:#f92672">.</span>round()<span style="color:#f92672">.</span>clamp_(<span style="color:#f92672">-</span><span style="color:#ae81ff">128</span>, <span style="color:#ae81ff">127</span>) <span style="color:#f92672">/</span> scale
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> y
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">weight_quant</span>(w):
+</span></span><span style="display:flex;"><span>    scale <span style="color:#f92672">=</span> <span style="color:#ae81ff">1.0</span> <span style="color:#f92672">/</span> w<span style="color:#f92672">.</span>abs()<span style="color:#f92672">.</span>mean()<span style="color:#f92672">.</span>clamp_(min<span style="color:#f92672">=</span><span style="color:#ae81ff">1e-5</span>)
+</span></span><span style="display:flex;"><span>    u <span style="color:#f92672">=</span> (w <span style="color:#f92672">*</span> scale)<span style="color:#f92672">.</span>round()<span style="color:#f92672">.</span>clamp_(<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">/</span> scale
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> u
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">BitLinear</span>(nn<span style="color:#f92672">.</span>Linear):
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    Only for training
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, x):
+</span></span><span style="display:flex;"><span>        w <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>weight
+</span></span><span style="display:flex;"><span>        x_norm <span style="color:#f92672">=</span> LN(x)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># A trick for implementing Straight−Through−Estimator (STE) using detach()</span>
+</span></span><span style="display:flex;"><span>        x_quant <span style="color:#f92672">=</span> x_norm <span style="color:#f92672">+</span> (activation_quant(x_norm) <span style="color:#f92672">-</span> x_norm)<span style="color:#f92672">.</span>detach()
+</span></span><span style="display:flex;"><span>        w_quant <span style="color:#f92672">=</span> w <span style="color:#f92672">+</span> (weight_quant(w) <span style="color:#f92672">-</span> w)<span style="color:#f92672">.</span>detach()
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Perform quantized linear transformation</span>
+</span></span><span style="display:flex;"><span>        y <span style="color:#f92672">=</span> F<span style="color:#f92672">.</span>linear(x_quant, w_quant)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> y
+</span></span></code></pre></div></section>
 
   
   
