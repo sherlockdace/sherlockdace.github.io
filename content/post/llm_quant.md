@@ -1,7 +1,7 @@
 ---
 title: "Quantization in LLMs"
 date: 2024-10-03T20:05:43+08:00
-draft: true
+draft: false
 math: true
 ---
 
