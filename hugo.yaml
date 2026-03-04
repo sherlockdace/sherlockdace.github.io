@@ -1,4 +1,37 @@
-baseURL: https://sherlockdace.github.io
-languageCode: en-us
-title: MORPHISM
+# === 基础站点配置 ===
+baseURL: "https://sherlockdace.github.io"
+languageCode: "en-us"
+title: "Zehua Liu"
 theme: "PaperMod"
+
+# === PaperMod 主题参数 ===
+params:
+  ShowFullTextinRSS: true          # RSS 显示全文
+  ShowReadingTime: true            # 显示阅读时间
+  ShowCodeCopyButtons: true        # 代码块显示复制按钮
+  defaultTheme: "auto"             # 主题模式: auto/dark/light
+
+  homeInfoParams:
+    Title: "Homepage"
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/sherlockdace"
+    - name: email
+      url: "mailto:liuzehua@connect.hku.hk"
+
+
+# === Markdown 渲染配置 (Goldmark) ===
+# 解决 LaTeX 公式中下划线 "_" 被错误解析为斜体的问题
+markup:
+  goldmark:
+    extensions:
+      passthrough:
+        enable: true
+        delimiters:
+          block:
+            - ['\[', '\]']
+            - ['$$', '$$']
+          inline:
+            - ['\(', '\)']
+            - ['$', '$']
