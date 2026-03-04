@@ -4,6 +4,9 @@ languageCode: "en-us"
 title: "Zehua Liu"
 theme: "PaperMod"
 
+enableInlineShortcodes: true
+enableRobotsTXT: true
+
 # === PaperMod 主题参数 ===
 params:
   ShowFullTextinRSS: true          # RSS 显示全文
