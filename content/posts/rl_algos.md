@@ -131,7 +131,23 @@ By plugging in different $f$-divergences, we recover different practical algorit
 
 ---
 
-## 5. Conclusion
+## 5. Numerical Stability and Practical Considerations
+
+While the theoretical formulation of RLC effectively regularizes the importance weights by penalizing the chosen $f$-divergence, empirical implementations often still suffer from numerical instability. In this section, we analyze the sources of this instability and discuss practical mitigation strategies.
+
+Fundamentally, both the original RLC objective and its surrogate counterpart rely on the computation of the importance weight $w_\theta(s) = \frac{\pi_\theta(s)}{\pi_b(s)}$. Because probabilities can be arbitrarily close to zero, this ratio is unbounded. Even though the difference between two probabilities is strictly bounded within $[-1, 1]$, their quotient can approach infinity, making the raw importance weight highly susceptible to numerical explosion.
+
+A natural question arises: if the divergence penalty is designed to constrain the variance of these weights, why does instability persist? The primary reason is that the penalty acts as a *soft* constraint (via Lagrangian relaxation) rather than a *hard* constraint. It encourages the target policy to remain close to the behavior policy over the optimization process, but it provides no strict upper bound on the importance weight at any single optimization step. Furthermore, because the penalty is evaluated as gradients are applied, transient spikes in the density ratio during the forward pass can immediately destabilize the optimizer before the regularization can correct the trajectory.
+
+To address this, we advocate for a hybrid approach that combines the theoretical elegance of the surrogate objective with the empirical robustness of weight clipping. Specifically, we define a clipped importance weight:
+$$ \tilde{w}_\theta(s) = \text{clip}(w_\theta(s), w_{\min}, w_{\max}) $$
+where $w_{\min}$ and $w_{\max}$ are chosen hyperparameters. By substituting $w_\theta(s)$ with $\tilde{w}_\theta(s)$ in the surrogate objective $\mathcal{J}_{\mathrm{sur}}(\theta)$, we guarantee that the gradients remain strictly bounded. This ensures that the policy updates are numerically stable while still benefiting from the nuanced penalty structures provided by the $f$-divergence derivatives.
+
+## 6. Empirical Comparison: RLC vs. Surrogate Objective
+
+*(This section is currently under construction. Future updates will include comprehensive experimental results evaluating the empirical performance, sample efficiency, and stability trade-offs between directly optimizing the dual RLC objective versus the derived unconstrained surrogate loss across standard continuous control benchmarks.)*
+
+## 7. Conclusion
 
 By choosing the right $f$-divergence, you can explicitly control the trade-off between bias, variance, and the shape of the desired target distribution. 
 
