@@ -5,8 +5,6 @@ title: 'Distribution Aware Fine-Tuning'
 math: true
 ---
 
-# Distribution Aware Fine-Tuning (DAFT)
-
 ## Background
 
 Let $\pi_\theta(y \mid x)$ be the model distribution, and let $\mathcal{D}$ be the input distribution. For each prompt $x \sim \mathcal{D}$, the model generates an output $y \sim \pi_\theta(\cdot \mid x)$. We are interested in maximizing the expected reward:

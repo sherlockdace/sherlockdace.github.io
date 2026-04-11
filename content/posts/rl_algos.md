@@ -1,11 +1,9 @@
 ---
-title: "Reinforcement Learning Algorithms and Importance Sampling"
+title: "Taming Importance Sampling in RL: A Divergence-Constrained Approach"
 date: 2026-02-05T21:33:55+08:00
 draft: false
 math: true
 ---
-
-# Taming Importance Sampling in RL: A Divergence-Constrained Approach
 
 If you've spent any time working on off-policy Reinforcement Learning (RL), you're intimately familiar with **Importance Sampling (IS)**. It's the standard trick used to estimate the expected return of a new target policy $\pi_\theta$ using samples collected from an older behavior policy $\pi_b$. 
 
