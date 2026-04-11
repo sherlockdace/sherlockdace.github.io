@@ -1,6 +1,6 @@
 ---
 date: '2026-04-11T10:31:01+08:00'
-draft: true
+draft: false
 title: 'An Exact Bias Correction for Truncated Bernoulli Groups'
 math: true
 ---
