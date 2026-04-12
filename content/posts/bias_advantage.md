@@ -420,3 +420,158 @@ So under the natural generalization from binary scores to finitely many score bu
 2. Three or more score levels: no analogous uniformly unbiased estimator exists after discarding all constant-score groups.
 
 If one uses a different truncation rule, the algebra changes. For example, if one discards only all-$0$ and all-$1$ groups but keeps groups that are constant at an interior score level, then the impossibility proof above no longer applies directly. But for the most natural extension of the Bernoulli setup, the conclusion is negative.
+
+
+## More Rollouts Reduce the Bias Envelope
+
+The impossibility results above concern exact unbiasedness. They do not imply that the ordinary retained-group mean stays badly biased when the rollout count $n$ grows. The correct statement is more precise.
+
+In this section, "more accurate" means "having smaller absolute bias relative to the original population mean." No claim about variance or mean-squared error is being made here.
+
+Let
+$$
+X_1,\dots,X_n
+$$
+be i.i.d. with finite support
+$$
+0 \le v_0 < v_1 < \cdots < v_m \le 1,
+$$
+and probabilities
+$$
+\mathbb{P}(X=v_j)=\pi_j, \qquad j=0,\dots,m,
+$$
+where at least two of the $\pi_j$ are positive. Define
+$$
+\mu := \mathbb{E}[X] = \sum_{j=0}^m v_j \pi_j,
+\qquad
+\bar X_n := \frac{1}{n}\sum_{i=1}^n X_i,
+$$
+and let
+$$
+S_n := \{X_1,\dots,X_n \text{ are not all equal}\}.
+$$
+In the Bernoulli case, $S_n$ is exactly the event $S=\{1 \le K \le n-1\}$ studied above.
+
+### Proposition
+
+For every $n \ge 2$,
+$$
+\mathbb{E}[\bar X_n \mid S_n] = \frac{\mu - \sum_{j=0}^m v_j \pi_j^n}{1-\sum_{j=0}^m \pi_j^n}.
+$$
+Therefore the bias of the retained-group mean is
+$$
+b_n := \mathbb{E}[\bar X_n \mid S_n] - \mu = \frac{\sum_{j=0}^m (\mu-v_j)\pi_j^n}{1-\sum_{j=0}^m \pi_j^n}. \tag{3}
+$$
+
+If we write
+$$
+\delta_n := \sum_{j=0}^m \pi_j^n, \qquad \alpha := \max_{0 \le j \le m} \pi_j,
+$$
+then $\alpha<1$ and
+$$
+|b_n| \le \frac{\delta_n}{1-\delta_n} \le \frac{\alpha^{n-1}}{1-\alpha^{n-1}}. \tag{4}
+$$
+Since $\alpha \in (0,1)$, the right-hand side of (4) is strictly decreasing in $n$ and converges to $0$ exponentially fast. Hence, for every fixed non-degenerate law, the truncation bias of the retained-group mean is bounded by a strictly decreasing function of the rollout count.
+
+### Proof
+
+Because $S_n$ is permutation-invariant and the sample is i.i.d., exchangeability gives
+$$
+\mathbb{E}[\bar X_n \mid S_n] = \mathbb{E}[X_1 \mid S_n].
+$$
+Also,
+$$
+\mathbb{E}[X_1 \mathbf{1}_{S_n}] = \mathbb{E}[X_1] - \mathbb{E}[X_1 \mathbf{1}_{\{X_1=\cdots=X_n\}}].
+$$
+Now
+$$
+\mathbb{E}[X_1] = \mu,
+$$
+and
+$$
+\mathbb{E}[X_1 \mathbf{1}_{\{X_1=\cdots=X_n\}}] = \sum_{j=0}^m v_j \,\mathbb{P}(X_1=\cdots=X_n=v_j) = \sum_{j=0}^m v_j \pi_j^n.
+$$
+Therefore
+$$
+\mathbb{E}[X_1 \mathbf{1}_{S_n}] = \mu - \sum_{j=0}^m v_j \pi_j^n.
+$$
+Similarly,
+$$
+\mathbb{P}(S_n) = 1-\sum_{j=0}^m \mathbb{P}(X_1=\cdots=X_n=v_j) = 1-\sum_{j=0}^m \pi_j^n.
+$$
+Dividing the last two identities yields
+$$
+\mathbb{E}[\bar X_n \mid S_n] = \frac{\mu - \sum_{j=0}^m v_j \pi_j^n}{1-\sum_{j=0}^m \pi_j^n},
+$$
+which proves (3).
+
+Next, since $0 \le \mu \le 1$ and $0 \le v_j \le 1$, we have
+$$
+|\mu-v_j| \le 1 \qquad \text{for all } j.
+$$
+Hence
+$$
+\left|\sum_{j=0}^m (\mu-v_j)\pi_j^n\right| \le \sum_{j=0}^m |\mu-v_j| \pi_j^n \le \sum_{j=0}^m \pi_j^n = \delta_n.
+$$
+Using (3), we obtain
+$$
+|b_n| \le \frac{\delta_n}{1-\delta_n}.
+$$
+Finally,
+$$
+\delta_n = \sum_{j=0}^m \pi_j \pi_j^{\,n-1} \le \alpha^{n-1}\sum_{j=0}^m \pi_j = \alpha^{n-1}.
+$$
+Substituting this into the previous inequality proves (4). Since at least two of the $\pi_j$ are positive, we have $\alpha<1$, and thus $\alpha^{n-1}/(1-\alpha^{n-1})$ is strictly decreasing in $n$ and converges to $0$. This completes the proof.
+
+### Bernoulli Specialization
+
+For the $0$-$1$ model,
+$$
+v_0=0,\qquad v_1=1,\qquad \pi_1=p,\qquad \pi_0=1-p,
+$$
+so (3) becomes
+$$
+b_n(p) = \mathbb{E}[\bar A \mid S]-p = \frac{p(1-p)\bigl[(1-p)^{n-1}-p^{n-1}\bigr]}{1-(1-p)^n-p^n}.
+$$
+Also, with
+$$
+\alpha = \max\{p,1-p\}<1,
+$$
+the general bound (4) gives
+$$
+|b_n(p)| \le \frac{\alpha^{n-1}}{1-\alpha^{n-1}}.
+$$
+Thus in the Bernoulli model, exact unbiased correction is delicate, but the bias of the naive retained-group mean is still exponentially suppressed as the rollout count grows.
+
+### Multi-Level Specialization
+
+For the finite multi-level model studied in the previous section, exact unbiased estimation is impossible for every $n \ge 2$. Nevertheless, the same bias formula (3) and the same exponential bound (4) remain valid. Therefore, although exact unbiased recovery fails, the naive retained-group mean still becomes asymptotically unbiased:
+$$
+\lim_{n\to\infty} \left|\mathbb{E}[\bar X_n \mid S_n]-\mu\right| = 0.
+$$
+
+### Important Precision
+
+For general multi-level rewards, the stronger statement
+$$
+|b_{n+1}| \le |b_n| \qquad \text{for every } n
+$$
+is false in general. The universally correct statement is the decreasing upper bound (4).
+
+Indeed, take support
+$$
+(v_0,v_1,v_2,v_3)=\left(0,\frac14,\frac12,1\right)
+$$
+and probabilities
+$$
+(\pi_0,\pi_1,\pi_2,\pi_3)=\left(\frac1{10},\frac1{10},\frac12,\frac3{10}\right).
+$$
+Then
+$$
+\mu = \frac{23}{40},
+$$
+and a direct substitution into (3) gives
+$$
+|b_3| = \frac{1}{705} < \frac{267}{185840} = |b_4|.
+$$
+So pointwise monotonicity of the absolute bias is not valid for every multi-level law. What holds without exception is the exponentially decaying envelope (4), and that is the mathematically correct sense in which more rollouts reduce the truncation error.
