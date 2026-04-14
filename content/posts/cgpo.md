@@ -41,7 +41,7 @@ $$ (x,y,A) \sim \mathcal B. $$
 
 Write the response as $y = (y_1,\dots,y_T)$, where $T := |y|$. Define token log-probabilities under the current policy:
 
-$$ \ell_{\theta,i}(x,y) := \log \pi_\theta(y_i \mid x, y_{ <i }). $$
+$$ \ell_{\theta,i}(x,y) := \log \pi_\theta(y_i \mid x, y_{\lt i}). $$
 
 Then
 
@@ -59,7 +59,7 @@ because $c_\theta(x,y) \ge \tau$ if and only if $\bar \ell_\theta(x,y) \ge \log 
 
 At token level, define
 
-$$ c_{\theta,i}(x,y) := \pi_\theta(y_i \mid x, y_{ <i }). $$
+$$ c_{\theta,i}(x,y) := \pi_\theta(y_i \mid x, y_{\lt i}). $$
 
 The geometric-mean sequence score is a better default than the raw sequence probability $\pi_\theta(y \mid x)$, because the latter shrinks exponentially with length and is therefore not comparable across responses of different lengths.
 
@@ -356,7 +356,7 @@ For a first implementation, the following version is a sensible default.
 
 The corresponding hard-mask objective is
 
-$$ \mathcal L_{\mathrm{CGPO}}(\theta) := \mathbb E_{(x,y,A) \sim \mathcal B}\left[A(x,y) \, \bar g_\theta(x,y,A) \sum_{i=1}^{|y|} \bar g_{\theta,i}(x,y,A) \, \log \pi_\theta(y_i \mid x, y_{ <i })\right]. $$
+$$ \mathcal L_{\mathrm{CGPO}}(\theta) := \mathbb E_{(x,y,A) \sim \mathcal B}\left[A(x,y) \, \bar g_\theta(x,y,A) \sum_{i=1}^{|y|} \bar g_{\theta,i}(x,y,A) \, \log \pi_\theta(y_i \mid x, y_{\lt i})\right]. $$
 
 Monitoring $\hat Z$ is especially important. If it collapses toward zero, then either the thresholds are too strict or the data distribution is too stale relative to the current policy. In either case, the bounds above predict a larger surrogate mismatch.
 
