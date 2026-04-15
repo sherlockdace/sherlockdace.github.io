@@ -1,19 +1,19 @@
 ---
 date: '2026-04-11T10:31:01+08:00'
 draft: false
-title: 'An Exact Bias Correction for Truncated Bernoulli Groups'
+title: 'An Exact Bias Correction for Truncated Reward Means'
 math: true
 ---
 
 ## Background
 
-Recent work such as [Your Group-Relative Advantage Is Biased](https://arxiv.org/abs/2601.08521) points out a simple but important issue in group-based RL for LLMs. For one prompt, we sample a group of responses, score them, and then construct a relative training signal from that group. In practice, groups that are entirely correct or entirely incorrect are often dropped, because they contain no within-group ranking information.
+Recent work such as [Your Group-Relative Advantage Is Biased](https://arxiv.org/abs/2601.08521) points out a simple but important issue in group-based RL for LLMs. For one prompt, we sample a group of responses and compute a reward for each response. It is natural to model those rewards as draws from a latent reward distribution induced by the prompt and the current policy. In the cleanest abstraction studied here, the reward is Bernoulli: $R_i=1$ means the answer is correct and $R_i=0$ means it is incorrect.
 
-That filtering step changes the statistical problem. Once we condition on keeping only the non-degenerate groups, the ordinary sample mean is no longer an unbiased estimator of the latent correctness probability.
+In practice, groups that are entirely correct or entirely incorrect are often dropped, because they contain no within-group ranking information. But the first bias appears before we ever form an advantage. Once we condition on keeping only the non-degenerate groups, the ordinary group mean reward is no longer an unbiased estimator of the latent mean reward. Any downstream advantage estimator that centers by that retained-group mean inherits the same truncation-induced bias through its baseline.
 
 This post studies the cleanest version of that question:
 
-> If we sample $n$ i.i.d. Bernoulli variables and discard the all-zero and all-one groups, can we still estimate the original Bernoulli mean exactly?
+> If we sample $n$ i.i.d. Bernoulli rewards and discard the all-zero and all-one groups, can we still estimate the original mean reward exactly?
 
 For this problem, the answer is complete:
 
@@ -22,14 +22,7 @@ For this problem, the answer is complete:
 
 ## Problem Setup
 
-Let
-$$
-A_1, \dots, A_n \overset{\mathrm{i.i.d.}}{\sim} \mathrm{Bernoulli}(p),
-$$
-and define the count
-$$
-K := \sum_{i=1}^n A_i.
-$$
+Let $$R_1, \dots, R_n \overset{\mathrm{i.i.d.}}{\sim} \mathrm{Bernoulli}(p),$$ where $R_i=1$ denotes a correct answer and $R_i=0$ an incorrect one, and define the count $$K := \sum_{i=1}^n R_i.$$
 
 We keep only non-degenerate groups:
 $$
@@ -46,28 +39,20 @@ $$
 \mathbb{P}_p(K=k \mid S) = \frac{\binom{n}{k}p^k(1-p)^{n-k}}{1-(1-p)^n-p^n}, \qquad k=1,\dots,n-1.
 $$
 
-Our goal is to find a statistic $T=T(A_1,\dots,A_n)$ such that
-$$
-\mathbb{E}_p[T \mid S] = p \qquad \text{for all } p \in (0,1).
-$$
+Our goal is to find a statistic $T=T(R_1,\dots,R_n)$ such that $$\mathbb{E}_p[T \mid S] = p \qquad \text{for all } p \in (0,1).$$
 
 ## The Naive Mean Becomes Biased
 
-Without truncation, the sample mean
-$$
-\bar A := \frac{K}{n}
-$$
-is unbiased for $p$. Under the conditional law given $S$, however,
-$$
-\mathbb{E}_p[\bar A \mid S] = \frac{\mathbb{E}_p[\bar A \mathbf{1}_S]}{\mathbb{P}_p(S)} = \frac{p - p^n}{1-(1-p)^n-p^n}.
-$$
+Without truncation, the sample mean $$\bar R := \frac{K}{n}$$ is unbiased for $p$. Under the conditional law given $S$, however, $$\mathbb{E}_p[\bar R \mid S] = \frac{\mathbb{E}_p[\bar R \mathbf{1}_S]}{\mathbb{P}_p(S)} = \frac{p - p^n}{1-(1-p)^n-p^n}.$$
 This is generally not equal to $p$.
 
 So the bias is not a numerical artifact. It is a structural consequence of conditioning on the event that a group contains at least one success and at least one failure.
 
+This is the fundamental `bias_reward` object in the Bernoulli setting: the retained-group mean reward is biased for the latent mean reward $p$. If the target baseline in an advantage construction is the latent mean reward, then replacing that baseline with $\bar R$ introduces the same truncation bias into the resulting plug-in advantage estimator.
+
 ## Reduction to a Function of the Count
 
-Even though an estimator could depend on the whole vector $(A_1,\dots,A_n)$, it is enough to study estimators of the form $h(K)$.
+Even though an estimator could depend on the whole vector $(R_1,\dots,R_n)$, it is enough to study estimators of the form $h(K)$.
 
 Indeed, conditioned on $K=k$, every binary vector with exactly $k$ ones is equally likely, and this conditional distribution does not depend on $p$. Therefore, if $T$ is any estimator, then its Rao-Blackwellization
 $$
@@ -209,38 +194,33 @@ $$
 \end{cases}
 $$
 
-## What This Means for Advantage Estimation
+## What This Means for Reward Means and Advantages
 
-At the level of this Bernoulli abstraction, the picture is exact:
+At the level of this Bernoulli reward abstraction, the picture is exact:
 
-1. If the group size is odd, the truncation bias can be removed analytically by replacing the retained-group mean with $\widehat p_n$.
-2. If the group size is even, no estimator can be unbiased for all $p$ after this truncation. Any correction must therefore be approximate, prior-dependent, or based on changing the sampling procedure.
+1. If the group size is odd, the truncation bias in the retained-group mean reward can be removed analytically by replacing $\bar R$ with $\widehat p_n$.
+2. If the group size is even, no estimator can be unbiased for all $p$ after this truncation. Any correction to the mean reward, and therefore to any advantage estimator built from that mean baseline, must be approximate, prior-dependent, or based on changing the sampling procedure.
 
-In particular, if one insists on exact unbiasedness, then an even group size is fundamentally incompatible with dropping all-zero and all-one groups.
+In particular, if one insists on exact unbiasedness, then an even group size is fundamentally incompatible with dropping all-zero and all-one reward groups.
 
-It is also worth being precise about scope. The result here solves the scalar estimation problem for the latent Bernoulli mean. It does not automatically imply that every downstream RL "advantage" constructed from that estimate is unbiased in a policy-gradient sense. But it completely characterizes what is possible at the level of truncated Bernoulli statistics.
+It is also worth being precise about scope. The exact result here solves the scalar estimation problem for the latent mean reward. If an advantage is defined relative to the latent baseline $p$, then the bias enters when we replace that baseline by the retained-group mean reward. So the primary object is the reward-mean bias, and the advantage bias is downstream. This still does not automatically imply that every policy-gradient quantity built from a practical advantage estimator is unbiased, because extra normalization or nonlinearities can introduce additional effects.
 
 ## Takeaway
 
-Discarding degenerate groups is not an innocent preprocessing step. It changes the sampling law, and the ordinary group mean becomes biased under the retained distribution.
+Discarding degenerate reward groups is not an innocent preprocessing step. It changes the sampling law, and the ordinary group mean reward becomes biased under the retained distribution.
 
 The full answer is:
 
-1. Odd group size: an exact closed-form correction exists,
-$$
-\widehat p_n = \frac{K}{n} - \frac{(-1)^{K-1}}{\binom{n}{K}}.
-$$
+1. Odd group size: an exact closed-form correction exists, $$\widehat p_n = \frac{K}{n} - \frac{(-1)^{K-1}}{\binom{n}{K}}.$$
 2. Even group size: exact unbiased recovery is impossible.
 
 So if the training pipeline drops all-correct and all-incorrect groups and you still want a mathematically exact correction, the parity of the group size is the deciding factor.
 
+At this level, the issue is more accurately described as `bias_reward` than `bias_advantage`: the bias originates in the retained-group mean reward, and any advantage that uses that mean as a baseline inherits it.
+
 ## Beyond Bernoulli: Multi-Level Scores
 
-The Bernoulli model is the two-level case: each score is either $0$ or $1$. A natural extension is to allow a finite score set
-$$
-0 = v_0 < v_1 < \cdots < v_m = 1,
-$$
-where $m \ge 2$, so there is at least one interior score level.
+The Bernoulli model is the two-level case: each score is either $0$ or $1$. A natural extension is to allow a finite score set $$0 = v_0 \lt v_1 \lt \cdots \lt v_m = 1,$$ where $m \ge 2$, so there is at least one interior score level.
 
 Let
 $$
@@ -298,7 +278,7 @@ N=(N_0,\dots,N_m), \qquad N_j := \sum_{i=1}^n \mathbf{1}\{X_i=v_j\},
 $$
 and define
 $$
-\mathcal{C} := \left\{ c=(c_0,\dots,c_m)\in \mathbb{N}_0^{m+1} : \sum_{j=0}^m c_j = n,\ \max_j c_j < n \right\}.
+\mathcal{C} := \left\{ c=(c_0,\dots,c_m)\in \mathbb{N}_0^{m+1} : \sum_{j=0}^m c_j = n,\ \max_j c_j \lt n \right\}.
 $$
 Thus $S_{\mathrm{multi}}=\{N \in \mathcal{C}\}$.
 
@@ -332,7 +312,7 @@ q_r := \pi_r \quad (r=1,\dots,m), \qquad s(q) := \sum_{r=1}^m q_r, \qquad \pi_0 
 $$
 Then (2) becomes an identity on the open set
 $$
-U := \{q \in \mathbb{R}^m : q_r>0,\ s(q)<1\}.
+U := \{q \in \mathbb{R}^m : q_r \gt 0,\ s(q) \lt 1\}.
 $$
 Define
 $$
@@ -378,7 +358,7 @@ We claim that $H$ is not the zero polynomial when $m\ge 2$ and $n\ge 2$. Indeed,
 $$
 q_1=q_2=t,\qquad q_3=\cdots=q_m=0,
 $$
-with $0<t<1/2$. Then $s(q)=2t$, so
+with $0 \lt t \lt 1/2$. Then $s(q)=2t$, so
 $$
 \begin{aligned}
 H(q)
@@ -386,7 +366,7 @@ H(q)
 &= (v_1+v_2)\bigl[(-1)^{n+1}2^n - 2\bigr] t^{n+1}.
 \end{aligned}
 $$
-Since $v_1,v_2>0$ and $n\ge 2$, the coefficient
+Since $v_1,v_2 \gt 0$ and $n\ge 2$, the coefficient
 $$
 (-1)^{n+1}2^n - 2
 $$
@@ -434,7 +414,7 @@ X_1,\dots,X_n
 $$
 be i.i.d. with finite support
 $$
-0 \le v_0 < v_1 < \cdots < v_m \le 1,
+0 \le v_0 \lt v_1 \lt \cdots \lt v_m \le 1,
 $$
 and probabilities
 $$
@@ -467,7 +447,7 @@ If we write
 $$
 \delta_n := \sum_{j=0}^m \pi_j^n, \qquad \alpha := \max_{0 \le j \le m} \pi_j,
 $$
-then $\alpha<1$ and
+then $\alpha \lt 1$ and
 $$
 |b_n| \le \frac{\delta_n}{1-\delta_n} \le \frac{\alpha^{n-1}}{1-\alpha^{n-1}}. \tag{4}
 $$
@@ -521,27 +501,16 @@ Finally,
 $$
 \delta_n = \sum_{j=0}^m \pi_j \pi_j^{\,n-1} \le \alpha^{n-1}\sum_{j=0}^m \pi_j = \alpha^{n-1}.
 $$
-Substituting this into the previous inequality proves (4). Since at least two of the $\pi_j$ are positive, we have $\alpha<1$, and thus $\alpha^{n-1}/(1-\alpha^{n-1})$ is strictly decreasing in $n$ and converges to $0$. This completes the proof.
+Substituting this into the previous inequality proves (4). Since at least two of the $\pi_j$ are positive, we have $\alpha \lt 1$, and thus $\alpha^{n-1}/(1-\alpha^{n-1})$ is strictly decreasing in $n$ and converges to $0$. This completes the proof.
 
 ### Bernoulli Specialization
 
-For the $0$-$1$ model,
-$$
-v_0=0,\qquad v_1=1,\qquad \pi_1=p,\qquad \pi_0=1-p,
-$$
-so (3) becomes
-$$
-b_n(p) = \mathbb{E}[\bar A \mid S]-p = \frac{p(1-p)\bigl[(1-p)^{n-1}-p^{n-1}\bigr]}{1-(1-p)^n-p^n}.
-$$
-Also, with
-$$
-\alpha = \max\{p,1-p\}<1,
-$$
+For the $0$-$1$ model, $$v_0=0,\qquad v_1=1,\qquad \pi_1=p,\qquad \pi_0=1-p,$$ so (3) becomes $$b_n(p) = \mathbb{E}[\bar R \mid S]-p = \frac{p(1-p)\bigl[(1-p)^{n-1}-p^{n-1}\bigr]}{1-(1-p)^n-p^n}.$$ Also, with $$\alpha = \max\{p,1-p\} \lt 1,$$
 the general bound (4) gives
 $$
 |b_n(p)| \le \frac{\alpha^{n-1}}{1-\alpha^{n-1}}.
 $$
-Thus in the Bernoulli model, exact unbiased correction is delicate, but the bias of the naive retained-group mean is still exponentially suppressed as the rollout count grows.
+Thus in the Bernoulli reward model, exact unbiased correction is delicate, but the bias of the naive retained-group mean reward is still exponentially suppressed as the rollout count grows.
 
 ### Multi-Level Specialization
 
@@ -566,12 +535,5 @@ and probabilities
 $$
 (\pi_0,\pi_1,\pi_2,\pi_3)=\left(\frac1{10},\frac1{10},\frac12,\frac3{10}\right).
 $$
-Then
-$$
-\mu = \frac{23}{40},
-$$
-and a direct substitution into (3) gives
-$$
-|b_3| = \frac{1}{705} < \frac{267}{185840} = |b_4|.
-$$
+Then $$\mu = \frac{23}{40},$$ and a direct substitution into (3) gives $$|b_3| = \frac{1}{705} \lt \frac{267}{185840} = |b_4|.$$
 So pointwise monotonicity of the absolute bias is not valid for every multi-level law. What holds without exception is the exponentially decaying envelope (4), and that is the mathematically correct sense in which more rollouts reduce the truncation error.
